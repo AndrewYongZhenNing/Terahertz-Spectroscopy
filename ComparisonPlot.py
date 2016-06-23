@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # this is a github edit again
+# and again, another edit here 
 
 def Comparison_Function(filename,vertical_shift,period): #filename needs to be in strings
     plot = np.loadtxt(filename + ".dat")
