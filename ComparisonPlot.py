@@ -56,27 +56,32 @@ def Average_Function(function_1,function_2):
 
     return (average_envelope_frequency, average_envelope_photocurrent)
 
-test_liszt = [1,2,3,4,5,6,7,8,9,10,11,12,13]
+#############
+# FIX THIS NEXT TIME, INCLUDE LOOPS TO GENERALISE THE FUNCTION
+###############
 
-def Noise_Reduction(data_file):
-    """Reduces the noise of a graph by taking the average from two nearest neighbours of each data point"""
-    noisy_data = data_file
-    # shortened_data = data_file[2:-2]
-    improved_data = []
-    start_index = 2
-    for point in noisy_data:
-        total = point[start_index-2] + point[start_index-1] + point[0] + point[start_index+1] + point[start_index+2]
+def Noise_Reduction(data_set, nearest_neighbours):
+    """Reduces the noise of a graph by taking the average from the nearest neighbours of each data point"""
+    noisy_data = data_set
+    improved_data = [noisy_data[0],noisy_data[1]]
+    start_index = nearest_neighbours
+
+    while start_index < len(noisy_data)-start_index: # -1 instead of -2 because must include the last third data and its average
+
+        total = noisy_data[(start_index)-2] + noisy_data[(start_index)-1] + noisy_data[start_index] + noisy_data[(start_index)+1] + noisy_data[(start_index)+2]
         average_point = total/5
-
         improved_data.append(average_point)
-        if point[start_index+1] == noisy_data[-1]:
-            break
+
+        start_index += 1
+
+    improved_data.append(noisy_data[-2])
+    improved_data.append(noisy_data[-1])
 
     return improved_data
 
-print test_liszt[2:-2][-1]
+# test_liszt = [11,62,3,4,5,6,7,8,9,10,11,12,13,14,150]
+# print Noise_Reduction(test_liszt)
 
-# test = Noise_Reduction
 leaf_average_x, leaf_average_y = Average_Function(Comparison_Function("leaf",0.19,23),Comparison_Function("leaf_2",0.092,23))[0], Average_Function(Comparison_Function("leaf",0.19,23),Comparison_Function("leaf_2",0.092,23))[1]
 water_45_x, water_45_y = Average_Function(Comparison_Function("water_45_2",0.08,20),Comparison_Function("water_45",0.08,20))[0], Average_Function(Comparison_Function("water_45_2",0.08,20),Comparison_Function("water_45",0.08,20))[1]
 
@@ -85,9 +90,9 @@ plt.title("Logarithmic Plot of Envelope Tetrahertz Photocurrent(nA) vs Frequency
 plt.xlabel("Frequency $GHz$")
 plt.ylabel("Photocurrent $nA$")
 
-plt.plot(Comparison_Function("water",0.6,25)[0], Comparison_Function("water",0.6,25)[1], label = 'Water Run 1', color = 'b')
+# plt.plot(Comparison_Function("water",0.6,25)[0], Comparison_Function("water",0.6,25)[1], label = 'Water Run 1', color = 'b')
 
-plt.plot(leaf_average_x, leaf_average_y, label = 'Average of Leaf Run', color = 'm')
+# plt.plot(leaf_average_x, leaf_average_y, label = 'Average of Leaf Run', color = 'm')
 
 # plt.plot(Comparison_Function("leaf",0.19,23)[0], Comparison_Function("leaf",0.19,23)[1], label = 'Leaf Run 1', color = 'g')
 
@@ -99,9 +104,12 @@ plt.plot(leaf_average_x, leaf_average_y, label = 'Average of Leaf Run', color = 
 
 # plt.plot(Comparison_Function("reference_45",0.1,18)[0], Comparison_Function("reference_45",0.1,18)[1], label = r'Reference 45$^\circ$  Run 1', color = 'firebrick')
 
-# plt.plot(water_45_x, water_45_y, label = r'Average of Water Run 45$^\circ$', color = 'forestgreen')
+# plt.plot(water_45_x, water_45_y, label = r'Average of Water Run 45$^\circ$', color = '')
 
-# plt.plot(Comparison_Function("water_45",0.08,20)[0], Comparison_Function("water_45",0.08,20)[1], label = r'Water 45$^\circ$  Run 1', color = 'orange')
+plt.plot(Comparison_Function("water_45",0.08,20)[0], Comparison_Function("water_45",0.08,20)[1], label = r'Water 45$^\circ$  Run 1', color = 'red')
+plt.plot(Comparison_Function("water_45",0.08,20)[0], Noise_Reduction(Comparison_Function("water_45",0.08,20)[1]), label = r'Water 45$^\circ$  Run 1', color = 'orange')
+
+
 
 # plt.plot(Comparison_Function("water_45_2",0.08,20)[0], Comparison_Function("water_45_2",0.08,20)[1], label = r'Water 45$^\circ$  Run 2', color = 'purple')
 
