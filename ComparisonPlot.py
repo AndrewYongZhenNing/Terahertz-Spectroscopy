@@ -63,32 +63,79 @@ def Average_Function(function_1,function_2):
 def Noise_Reduction(data_set, nearest_neighbours):
     """Reduces the noise of a graph by taking the average from the nearest neighbours of each data point"""
     noisy_data = data_set
-    improved_data = [noisy_data[0],noisy_data[1]]
+    improved_data = []
     start_index = nearest_neighbours
 
-    while start_index < len(noisy_data)-start_index: # -1 instead of -2 because must include the last third data and its average
 
-        total = noisy_data[(start_index)-2] + noisy_data[(start_index)-1] + noisy_data[start_index] + noisy_data[(start_index)+1] + noisy_data[(start_index)+2]
-        average_point = total/5
+    for index in range(0,nearest_neighbours): #fill in improved_data list with the first 'unused' points first (from 0th data point to (start_index-1)th data point)
+        improved_data.append(noisy_data[index])
+
+    liszt = []
+
+
+    while start_index < len(noisy_data) - nearest_neighbours:#while start_index < 11,  maximum is thus 11 in this case
+        i = -(nearest_neighbours) #left most neighbour
+        while i < nearest_neighbours+1: #maximum value of i is equal to start index
+            liszt.append(noisy_data[(start_index)+i])
+            i +=1
+
+    # for i in range(-(nearest_neighbours),(nearest_neighbours)): #for loop is awkward, fix here
+    #     liszt.append(start_index+i)
+        # for points in noisy_data[(start_index)+i]:
+        #     liszt.append(points)
+        # print 'current list is:',liszt
+
+        total = sum(liszt)
+        average_point = (1.*total)/((nearest_neighbours*2)+1) # the 1. is there to convert fractions into accurate decimal points
         improved_data.append(average_point)
+        liszt[:] = [] #empties the list to be re-used again
 
         start_index += 1
 
-    improved_data.append(noisy_data[-2])
-    improved_data.append(noisy_data[-1])
+
+    for index in range(len(noisy_data)-nearest_neighbours,len(noisy_data)): #fill in final few points into improved data
+        improved_data.append(noisy_data[index])
 
     return improved_data
 
-# test_liszt = [11,62,3,4,5,6,7,8,9,10,11,12,13,14,150]
-# print Noise_Reduction(test_liszt)
+
+test_liszt = [11,62,3,4,5,6,7,8,9,10,11,12,13,14,150]
+liszt = []
+output_liszt = []
+# test_liszt[:] = [] # empties the list again
+
+nearest_neighbours= 4
+start_index = nearest_neighbours
+
+# print 'number of points = ', len(test_liszt)- nearest_neighbours
+
+while start_index < len(test_liszt) - nearest_neighbours: #while start_index < 11,  maximum is thus 11 in this case
+    i = -nearest_neighbours # when re-iterating, resets i back to nearest neighbour value
+    while i < nearest_neighbours+1: #maximum value of i is equal to start index
+        # for points in test_liszt[(start_index)+i]
+        liszt.append(test_liszt[(start_index)+i])
+        i +=1
+    total = sum(liszt)
+    average_point = (1.*total)/((nearest_neighbours*2)+1)
+    output_liszt.append(average_point)
+    liszt[:] = []
+
+    start_index += 1
+
+# print 'average points = ', output_liszt, 'number of average points = ', len(output_liszt)
+
+print Noise_Reduction(test_liszt, 4)
+print len(Noise_Reduction(test_liszt, 4))
+# blank = sum(test_liszt)
+# print blank
 
 leaf_average_x, leaf_average_y = Average_Function(Comparison_Function("leaf",0.19,23),Comparison_Function("leaf_2",0.092,23))[0], Average_Function(Comparison_Function("leaf",0.19,23),Comparison_Function("leaf_2",0.092,23))[1]
 water_45_x, water_45_y = Average_Function(Comparison_Function("water_45_2",0.08,20),Comparison_Function("water_45",0.08,20))[0], Average_Function(Comparison_Function("water_45_2",0.08,20),Comparison_Function("water_45",0.08,20))[1]
 
-plt.figure()
-plt.title("Logarithmic Plot of Envelope Tetrahertz Photocurrent(nA) vs Frequency(GHz)")
-plt.xlabel("Frequency $GHz$")
-plt.ylabel("Photocurrent $nA$")
+# plt.figure()
+# plt.title("Logarithmic Plot of Envelope Tetrahertz Photocurrent(nA) vs Frequency(GHz)")
+# plt.xlabel("Frequency $GHz$")
+# plt.ylabel("Photocurrent $nA$")
 
 # plt.plot(Comparison_Function("water",0.6,25)[0], Comparison_Function("water",0.6,25)[1], label = 'Water Run 1', color = 'b')
 
@@ -106,12 +153,12 @@ plt.ylabel("Photocurrent $nA$")
 
 # plt.plot(water_45_x, water_45_y, label = r'Average of Water Run 45$^\circ$', color = '')
 
-plt.plot(Comparison_Function("water_45",0.08,20)[0], Comparison_Function("water_45",0.08,20)[1], label = r'Water 45$^\circ$  Run 1', color = 'red')
-plt.plot(Comparison_Function("water_45",0.08,20)[0], Noise_Reduction(Comparison_Function("water_45",0.08,20)[1]), label = r'Water 45$^\circ$  Run 1', color = 'orange')
+# plt.plot(Comparison_Function("water_45",0.08,20)[0], Comparison_Function("water_45",0.08,20)[1], label = r'Water 45$^\circ$  Run 1', color = 'red')
+# plt.plot(Comparison_Function("water_45",0.08,20)[0], Noise_Reduction(Comparison_Function("water_45",0.08,20)[1]), label = r'Water 45$^\circ$  Run 1', color = 'orange')
 
 
 
 # plt.plot(Comparison_Function("water_45_2",0.08,20)[0], Comparison_Function("water_45_2",0.08,20)[1], label = r'Water 45$^\circ$  Run 2', color = 'purple')
-
-plt.legend()
-plt.show()
+#
+# plt.legend()
+# plt.show()
