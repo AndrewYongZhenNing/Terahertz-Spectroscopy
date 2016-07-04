@@ -1,7 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-
+#############################
+# FUNCTION FOR DATA ANALYSIS
+#############################
 
 def Comparison_Function(filename,vertical_shift,period): #filename needs to be in strings
     """Given a data file, this function plots a graph"""
@@ -51,17 +53,15 @@ def Average_Function(function_1,function_2):
         average_frequency = (frequency_1+frequency_2) * 0.5
         average_envelope_frequency.append(average_frequency)
     for photocurrent_1, photocurrent_2 in zip(function_1[1],function_2[1]): # photocurrent interation
-         average_photocurrent = (photocurrent_1+ photocurrent_2) * 0.5
+         average_photocurrent = (photocurrent_1 + photocurrent_2) * 0.5
          average_envelope_photocurrent.append(average_photocurrent)
 
     return (average_envelope_frequency, average_envelope_photocurrent)
 
-#############
-# FIX THIS NEXT TIME, INCLUDE LOOPS TO GENERALISE THE FUNCTION
-###############
+
 
 def Noise_Reduction(data_set, nearest_neighbours):
-    """Reduces the noise of a graph by taking the average from the nearest neighbours of each data point"""
+    """Improves the quality of the data by reducing the noise of a graph. Takes the average from the nearest neighbours of each data point."""
     noisy_data = data_set
     improved_data = []
     start_index = nearest_neighbours
@@ -75,7 +75,7 @@ def Noise_Reduction(data_set, nearest_neighbours):
 
     while start_index < len(noisy_data) - nearest_neighbours:#while start_index < 11,  maximum is thus 11 in this case
         i = -(nearest_neighbours) #left most neighbour
-        while i < nearest_neighbours+1: #maximum value of i is equal to start index
+        while i < nearest_neighbours+1: #maximum value of i is equal to right most value
             liszt.append(noisy_data[(start_index)+i])
             i +=1
 
@@ -99,66 +99,71 @@ def Noise_Reduction(data_set, nearest_neighbours):
     return improved_data
 
 
-test_liszt = [11,62,3,4,5,6,7,8,9,10,11,12,13,14,150]
-liszt = []
-output_liszt = []
-# test_liszt[:] = [] # empties the list again
 
-nearest_neighbours= 4
-start_index = nearest_neighbours
-
-# print 'number of points = ', len(test_liszt)- nearest_neighbours
-
-while start_index < len(test_liszt) - nearest_neighbours: #while start_index < 11,  maximum is thus 11 in this case
-    i = -nearest_neighbours # when re-iterating, resets i back to nearest neighbour value
-    while i < nearest_neighbours+1: #maximum value of i is equal to start index
-        # for points in test_liszt[(start_index)+i]
-        liszt.append(test_liszt[(start_index)+i])
-        i +=1
-    total = sum(liszt)
-    average_point = (1.*total)/((nearest_neighbours*2)+1)
-    output_liszt.append(average_point)
-    liszt[:] = []
-
-    start_index += 1
-
-# print 'average points = ', output_liszt, 'number of average points = ', len(output_liszt)
-
-print Noise_Reduction(test_liszt, 4)
-print len(Noise_Reduction(test_liszt, 4))
-# blank = sum(test_liszt)
-# print blank
 
 leaf_average_x, leaf_average_y = Average_Function(Comparison_Function("leaf",0.19,23),Comparison_Function("leaf_2",0.092,23))[0], Average_Function(Comparison_Function("leaf",0.19,23),Comparison_Function("leaf_2",0.092,23))[1]
-water_45_x, water_45_y = Average_Function(Comparison_Function("water_45_2",0.08,20),Comparison_Function("water_45",0.08,20))[0], Average_Function(Comparison_Function("water_45_2",0.08,20),Comparison_Function("water_45",0.08,20))[1]
+water_45_x, water_45_y = Average_Function(Comparison_Function("water_45_2",0.08,22),Comparison_Function("water_45",0.08,22))[0], Average_Function(Comparison_Function("water_45_2",0.08,22),Comparison_Function("water_45",0.08,22))[1]
+water_45_closer_x, water_45_closer_y = Average_Function(Comparison_Function("water_45_closer_2",0.09,22),Comparison_Function("water_45_closer",0.09,22))[0], Average_Function(Comparison_Function("water_45_2",0.08,22),Comparison_Function("water_45",0.09,22))[1]
+reference_45_closer_x, reference_45_closer_y = Average_Function(Comparison_Function("reference_45_closer_2",0.09,22),Comparison_Function("reference_45_closer",0.09,22))[0], Average_Function(Comparison_Function("reference_45_closer_2",0.09,22),Comparison_Function("reference_45_closer",0.09,22))[1]
 
-# plt.figure()
-# plt.title("Logarithmic Plot of Envelope Tetrahertz Photocurrent(nA) vs Frequency(GHz)")
-# plt.xlabel("Frequency $GHz$")
-# plt.ylabel("Photocurrent $nA$")
+###############
+# PLOT SECTION
+###############
 
-# plt.plot(Comparison_Function("water",0.6,25)[0], Comparison_Function("water",0.6,25)[1], label = 'Water Run 1', color = 'b')
+plt.figure()
+plt.title("Logarithmic Plot of Envelope Tetrahertz Photocurrent(nA) vs Frequency(GHz)")
+plt.xlabel("Frequency $GHz$")
+plt.ylabel("Photocurrent $nA$")
 
-# plt.plot(leaf_average_x, leaf_average_y, label = 'Average of Leaf Run', color = 'm')
-
-# plt.plot(Comparison_Function("leaf",0.19,23)[0], Comparison_Function("leaf",0.19,23)[1], label = 'Leaf Run 1', color = 'g')
-
-# plt.plot(Average_Function(Comparison_Function("reference_scan2",0.5,24),Comparison_Function("reference_scan2.1",0.5,24))[0],Average_Function(Comparison_Function("reference_scan2",0.5,24),Comparison_Function("reference_scan2.1",0.5,24))[1],  color = 'r', label = 'Average Reference Run')
-
-# plt.plot(Comparison_Function("leaf_2",0.092,23)[2], Comparison_Function("leaf_2",0.092,23)[3], label = 'Leaf Run 2', color = 'm') # period = 28
-
-# plt.plot(Average_Function(Comparison_Function("water_45",0.5,20),Comparison_Function("water_45",0.5,20))[0],Average_Function(Comparison_Function("water_45_2",0.5,20),Comparison_Function("water_45_2",0.5,20))[1])
-
-# plt.plot(Comparison_Function("reference_45",0.1,18)[0], Comparison_Function("reference_45",0.1,18)[1], label = r'Reference 45$^\circ$  Run 1', color = 'firebrick')
-
-# plt.plot(water_45_x, water_45_y, label = r'Average of Water Run 45$^\circ$', color = '')
-
-# plt.plot(Comparison_Function("water_45",0.08,20)[0], Comparison_Function("water_45",0.08,20)[1], label = r'Water 45$^\circ$  Run 1', color = 'red')
-# plt.plot(Comparison_Function("water_45",0.08,20)[0], Noise_Reduction(Comparison_Function("water_45",0.08,20)[1]), label = r'Water 45$^\circ$  Run 1', color = 'orange')
-
-
-
-# plt.plot(Comparison_Function("water_45_2",0.08,20)[0], Comparison_Function("water_45_2",0.08,20)[1], label = r'Water 45$^\circ$  Run 2', color = 'purple')
+# REFERENCE RUN
 #
-# plt.legend()
-# plt.show()
+# plt.plot(Average_Function(Comparison_Function("reference_scan2",0.5,24),Comparison_Function("reference_scan2.1",0.5,24))[0],Average_Function(Comparison_Function("reference_scan2",0.5,24),Comparison_Function("reference_scan2.1",0.5,24))[1],  color = 'r', label = 'Average Reference Run')
+# plt.plot(Comparison_Function("reference_45",0.1,20)[0], Comparison_Function("reference_45",0.1,20)[1], label = r'Reference 45$^\circ$  Run 1', color = 'firebrick')
+# plt.scatter(Comparison_Function("reference_45",0.1,18)[2], Comparison_Function("reference_45",0.1,18)[3], label = r'Reference 45$^\circ$  Run 1', color = 'firebrick')
+# plt.plot(Comparison_Function("reference_45",0.1,20)[0], Noise_Reduction(Comparison_Function("reference_45",0.1,20)[1],8), label = r'Reference 45$^\circ$  Run 1', color = 'firebrick')
+# plt.plot(Comparison_Function("reference_45_closer",0.09,22)[0], Noise_Reduction(Comparison_Function("reference_45_closer",0.09,22)[1],4), label = r'Reference 45$^\circ$  Run 2.1', color = 'darkgreen')
+# plt.scatter(Comparison_Function("reference_45_closer",0.09,22)[2], Comparison_Function("reference_45_closer",0.09,22)[3], label = r'Reference 45$^\circ$  Run 2.1', color = 'darkgreen')
+# plt.plot(Comparison_Function("reference_45_closer_2",0.09,23)[0], Noise_Reduction(Comparison_Function("reference_45_closer_2",0.09,23)[1],4), label = r'Reference 45$^\circ$  Run 2.2', color = 'firebrick')
+# plt.scatter(Comparison_Function("reference_45_closer_2",0.09,23)[0], Comparison_Function("reference_45_closer_2",0.09,23)[1], label = r'Reference 45$^\circ$  Run 2.2', color = 'firebrick')
+
+# plt.plot(reference_45_closer_x, Noise_Reduction(reference_45_closer_y,4), label = 'Average o Reference Scan 2', color = 'fuchsia')
+#
+# WATER RUN
+plt.plot(Comparison_Function("water",0.6,25)[2], Comparison_Function("water",0.6,25)[3], label = 'Water Run 1 Without Average', color = 'b')
+## plt.plot(Comparison_Function("water",0.6,25)[0], Noise_Reduction(Comparison_Function("water",0.6,25)[1],14), label = 'Water Run 1', color = 'b')
+
+# plt.plot(Comparison_Function("water_45",0.08,22)[2], Noise_Reduction(Comparison_Function("water_45",0.08,22)[3],4), label = r'Water 45$^\circ$  Run 1.1', color = 'orange')
+# plt.scatter(Comparison_Function("water_45",0.08,20)[2], Noise_Reduction(Comparison_Function("water_45",0.08,20)[3],4), label = r'Water 45$^\circ$  Run 1.1', color = 'orange')
+
+## plt.plot(Comparison_Function("water_45_2",0.08,20)[0], Noise_Reduction(Comparison_Function("water_45_2",0.08,20)[1],4), label = r'Water 45$^\circ$  Run 1.2', color = 'r')
+## USE THE ONE BELOW FOR COMPARING WITH WATER_45
+
+# USE THIS
+# plt.plot(water_45_x, Noise_Reduction(water_45_y,4), label = r'Average of Water 45$^\circ$ Run 1' , color = 'r')
+# plt.plot(water_45_closer_x, Noise_Reduction(water_45_closer_y,4), label = r'Average of Water 45$^\circ$ Run 2' , color = 'b')
+
+##
+## plt.plot(Comparison_Function("water_45_closer",0.09,23)[2], Comparison_Function("water_45_closer",0.09,23)[3], label = 'Water 45$^\circ$ Run 2.1', color = 'chartreuse')
+## plt.scatter(Comparison_Function("water_45_closer",0.09,23)[2], Comparison_Function("water_45_closer",0.09,23)[3], label = 'Water 45$^\circ$ Run 2.1', color = 'chartreuse')
+## plt.plot(Comparison_Function("water_45_closer_2",0.08,34)[2], Comparison_Function("water_45_closer_2",0.08,34)[3], label = 'Water 45$^\circ$ Run 2.2', color = 'maroon')
+## plt.scatter(Comparison_Function("water_45_closer_2",0.08,34)[2], Comparison_Function("water_45_closer_2",0.08,34)[3], label = 'Water 45$^\circ$ Run 2.2', color = 'r')
+## plt.plot(Comparison_Function("water_45_closer",0.09,34)[0], Noise_Reduction(Comparison_Function("water_45_closer",0.09,34)[1],4), label = 'Water 45$^\circ$ Run 2.1', color = 'chartreuse')
+
+# plt.plot(Comparison_Function("water_45_closer_2",0.09,22)[0], Noise_Reduction(Comparison_Function("water_45_closer_2",0.09,22)[1],4), label = 'Water 45$^\circ$ Run 2.2', color = 'maroon')
+
+
+# plt.scatter(Comparison_Function("water_45_closer_2",0.08,22)[0], Noise_Reduction(Comparison_Function("water_45_closer_2",0.08,22)[1],4), label = 'Water 45$^\circ$ Run 2.2', color = 'maroon')
+# plt.plot(water_45_closer_x, Noise_Reduction(water_45_closer_y,4), label = 'Average of Water 45$^\circ$', color = 'darksalmon')
+# plt.scatter(water_45_closer_x, Noise_Reduction(water_45_closer_y,4), label = 'Average of Water 45$^\circ$', color = 'darksalmon')
+
+# LEAF RUN
+# plt.plot(Comparison_Function("leaf",0.19,23)[0], Comparison_Function("leaf",0.19,23)[1], label = 'Leaf Run 1', color = 'g')
+# plt.plot(Comparison_Function("leaf_2",0.092,23)[0], Comparison_Function("leaf_2",0.092,23)[1], label = 'Leaf Run 2', color = 'm') # period = 28
+# plt.plot(leaf_average_x, Noise_Reduction(leaf_average_y,4), label = 'Average of Leaf Run', color = 'sandybrown')
+
+# ACERTONE RUN
+# plt.plot(Comparison_Function("acetone_closer",0.1,20)[0],Noise_Reduction(Comparison_Function("acetone_closer",0.1,20)[1],4), label = 'Acetone Run 1', color = 'chocolate')
+
+# plt.spines['bottom'].set_position('zero')
+plt.legend()
+plt.show()
