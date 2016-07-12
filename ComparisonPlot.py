@@ -6,7 +6,7 @@ from scipy.optimize import curve_fit
 # FUNCTION FOR DATA ANALYSIS
 #############################
 
-def Comparison_Function(filename,vertical_shift,period): #filename needs to be in strings
+def Compare(filename,vertical_shift,period): #filename needs to be in strings
     """Given a data file, this function plots a graph"""
 
     # def obtain_period(frequency_data,photocurrent_data):
@@ -54,7 +54,7 @@ def Comparison_Function(filename,vertical_shift,period): #filename needs to be i
 
     return (envelope_frequency_list,log_envelope_photocurrent_list,frequency_list,photocurrent_list)
 #
-def Average_Function(function_1,function_2):
+def Average(function_1,function_2):
     """Takes two functions of the same dimension to make an average"""
     average_envelope_frequency = []
     average_envelope_photocurrent = []
@@ -110,20 +110,36 @@ def Noise_Reduction(data_set, nearest_neighbours):
 
 
 
-reference_x, reference_y = Average_Function(Comparison_Function("reference_scan2",0.5,24),Comparison_Function("reference_scan2.1",0.5,24))[0],Average_Function(Comparison_Function("reference_scan2",0.5,24),Comparison_Function("reference_scan2.1",0.5,24))[1]
-leaf_average_x, leaf_average_y = Average_Function(Comparison_Function("leaf",0.19,23),Comparison_Function("leaf_2",0.092,23))[0], Average_Function(Comparison_Function("leaf",0.19,23),Comparison_Function("leaf_2",0.092,23))[1]
-water_45_x, water_45_y = Average_Function(Comparison_Function("water_45_2",0.08,22),Comparison_Function("water_45",0.08,22))[0], Average_Function(Comparison_Function("water_45_2",0.08,22),Comparison_Function("water_45",0.08,22))[1]
-water_45_closer_x, water_45_closer_y = Average_Function(Comparison_Function("water_45_closer_2",0.09,22),Comparison_Function("water_45_closer",0.09,22))[0], Average_Function(Comparison_Function("water_45_2",0.08,22),Comparison_Function("water_45",0.09,22))[1]
-reference_45_closer_x, reference_45_closer_y = Average_Function(Comparison_Function("reference_45_closer_2",0.09,22),Comparison_Function("reference_45_closer",0.09,22))[0], Average_Function(Comparison_Function("reference_45_closer_2",0.09,22),Comparison_Function("reference_45_closer",0.09,22))[1]
-reference_lens_x, reference_lens_y = Average_Function(Comparison_Function("reference_lens_2",0.0,20),Comparison_Function("reference_lens_2.1",0.00,20))[0], Average_Function(Comparison_Function("reference_lens_2",0.0,20),Comparison_Function("reference_lens_2.1",0.0,20))[1]
+# reference_x, reference_y = Average(Compare("reference_scan2",0.5,24),Compare("reference_scan2.1",0.5,24))[0],Average(Compare("reference_scan2",0.5,24),Compare("reference_scan2.1",0.5,24))[1]
+leaf_average_x, leaf_average_y = Average(Compare("leaf",0.19,23),Compare("leaf_2",0.092,23))[0], Average(Compare("leaf",0.19,23),Compare("leaf_2",0.092,23))[1]
+water_45_x, water_45_y = Average(Compare("water_45_2",0.08,22),Compare("water_45",0.08,22))[0], Average(Compare("water_45_2",0.08,22),Compare("water_45",0.08,22))[1]
+water_45_closer_x, water_45_closer_y = Average(Compare("water_45_closer_2",0.09,22),Compare("water_45_closer",0.09,22))[0], Average(Compare("water_45_2",0.08,22),Compare("water_45",0.09,22))[1]
+reference_45_closer_x, reference_45_closer_y = Average(Compare("reference_45_closer_2",0.09,22),Compare("reference_45_closer",0.09,22))[0], Average(Compare("reference_45_closer_2",0.09,22),Compare("reference_45_closer",0.09,22))[1]
+reference_lens_x, reference_lens_y = Average(Compare("reference_lens_2",0.0,20),Compare("reference_lens_2.1",0.00,20))[0], Average(Compare("reference_lens_2",0.0,20),Compare("reference_lens_2.1",0.0,20))[1]
 
 
-sinusodial_oscillation = []
-for photocurrent, smooth_photocurrent in zip(reference_lens_y,Noise_Reduction(reference_lens_y,4)):
-    oscillation_point = photocurrent - smooth_photocurrent
-    sinusodial_oscillation.append(oscillation_point)
-
-
+# sinusodial_oscillation = []
+#
+# for photocurrent1, photocurrent2 in zip(Noise_Reduction(reference_lens_y,4),Noise_Reduction(reference_lens_y,40)):
+#     oscillation_point = photocurrent1 - photocurrent2
+#     sinusodial_oscillation.append(oscillation_point)
+#
+# def function(x,a,b,c):
+#         return a*np.sin(b*x)+c
+#
+# popt,pcov = curve_fit(function,reference_lens_x,sinusodial_oscillation,p0=(1.8,0.31,0)) # b = 0.33069
+#
+# print 'a = ', popt[0], ' b = ', popt[1], ' c = ', popt[2]
+#
+# x_data = np.linspace(50,1500, len(reference_lens_x)) # ANALYSE sinusodial_oscillation USING FOURIER TRANSFORM/ FIND OUT HOW PERIOD CHANGES
+#
+# final_photocurrent = []
+#
+# for photocurrent, oscillation in zip(Noise_Reduction(reference_lens_y,4), function(x_data, 1.8, 0.31, popt[2])):
+#     reduced_oscillation = photocurrent - abs(oscillation)
+#     final_photocurrent.append(reduced_oscillation)
+#
+# print 'original = ', Noise_Reduction(reference_lens_y,4)[0:4], ' curve fit = ', function(x_data, 1.8, 0.31, popt[2])[0:4], ' final photocurrent = ', final_photocurrent[0:4]
 
 ###############
 # PLOT SECTION
@@ -133,80 +149,83 @@ plt.figure()
 plt.title("Logarithmic Plot of Envelope Tetrahertz Photocurrent(nA) vs Frequency(GHz)")
 plt.xlabel("Frequency $GHz$")
 plt.ylabel("Photocurrent $nA$")
-
-plt.plot(reference_lens_x, sinusodial_oscillation)
-plt.show()
+#
+# plt.plot(x_data,function(x_data, 1.8,0.31,popt[2]), label = 'curve fit')
+# plt.plot(reference_lens_x, sinusodial_oscillation, label = 'data')
+# plt.figure()
+# plt.plot(reference_lens_x, final_photocurrent, label = 'improved data')
 
 # REFERENCE RUN
 #
-# plt.plot(Comparison_Function("reference_scan2",0.5,24)[2],Comparison_Function("reference_scan2",0.5,24)[3],  color = 'r', label = 'Average Reference Run')
-# plt.scatter(Comparison_Function("reference_scan2",0.5,24)[2],Comparison_Function("reference_scan2",0.5,24)[3],  color = 'r', label = 'Average Reference Run')
-# plt.plot(Comparison_Function("reference_scan2.1",0.5,24)[0],Comparison_Function("reference_scan2.1",0.5,24)[1],color = 'r')
+# plt.plot(Compare("reference_scan2",0.5,24)[2],Compare("reference_scan2",0.5,24)[3],  color = 'r', label = 'Average Reference Run')
+# plt.scatter(Compare("reference_scan2",0.5,24)[2],Compare("reference_scan2",0.5,24)[3],  color = 'r', label = 'Average Reference Run')
+# plt.plot(Compare("reference_scan2.1",0.5,24)[0],Compare("reference_scan2.1",0.5,24)[1],color = 'r')
 # plt.plot(reference_x, Noise_Reduction(reference_y,4), color = 'r', label = 'Average Reference Run')
 
-# plt.plot(Comparison_Function("reference_45",0.1,20)[0], Comparison_Function("reference_45",0.1,20)[1], label = r'Reference 45$^\circ$  Run 1', color = 'firebrick')
-# plt.scatter(Comparison_Function("reference_45",0.1,18)[2], Comparison_Function("reference_45",0.1,18)[3], label = r'Reference 45$^\circ$  Run 1', color = 'firebrick')
-# plt.plot(Comparison_Function("reference_45",0.1,20)[0], Noise_Reduction(Comparison_Function("reference_45",0.1,20)[1],8), label = r'Reference 45$^\circ$  Run 1', color = 'firebrick')
-# plt.plot(Comparison_Function("reference_45_closer",0.09,22)[0], Noise_Reduction(Comparison_Function("reference_45_closer",0.09,22)[1],4), label = r'Reference 45$^\circ$  Run 2.1', color = 'darkgreen')
-# plt.scatter(Comparison_Function("reference_45_closer",0.09,22)[2], Comparison_Function("reference_45_closer",0.09,22)[3], label = r'Reference 45$^\circ$  Run 2.1', color = 'darkgreen')
-# plt.plot(Comparison_Function("reference_45_closer_2",0.09,23)[0], Noise_Reduction(Comparison_Function("reference_45_closer_2",0.09,23)[1],4), label = r'Reference 45$^\circ$  Run 2.2', color = 'firebrick')
-# plt.scatter(Comparison_Function("reference_45_closer_2",0.09,23)[0], Comparison_Function("reference_45_closer_2",0.09,23)[1], label = r'Reference 45$^\circ$  Run 2.2', color = 'firebrick')
-# plt.scatter(Comparison_Function("reference_lens",0.05,23)[0], Comparison_Function("reference_lens",0.05,23)[1], label = r'Reference with Lens  Run 1', color = 'firebrick')
+# plt.plot(Compare("reference_45",0.1,20)[0], Compare("reference_45",0.1,20)[1], label = r'Reference 45$^\circ$  Run 1', color = 'firebrick')
+# plt.scatter(Compare("reference_45",0.1,18)[2], Compare("reference_45",0.1,18)[3], label = r'Reference 45$^\circ$  Run 1', color = 'firebrick')
+# plt.plot(Compare("reference_45",0.1,20)[0], Noise_Reduction(Compare("reference_45",0.1,20)[1],8), label = r'Reference 45$^\circ$  Run 1', color = 'firebrick')
+# plt.plot(Compare("reference_45_closer",0.09,22)[0], Noise_Reduction(Compare("reference_45_closer",0.09,22)[1],4), label = r'Reference 45$^\circ$  Run 2.1', color = 'darkgreen')
+# plt.scatter(Compare("reference_45_closer",0.09,22)[2], Compare("reference_45_closer",0.09,22)[3], label = r'Reference 45$^\circ$  Run 2.1', color = 'darkgreen')
+# plt.plot(Compare("reference_45_closer_2",0.09,23)[0], Noise_Reduction(Compare("reference_45_closer_2",0.09,23)[1],4), label = r'Reference 45$^\circ$  Run 2.2', color = 'firebrick')
+# plt.scatter(Compare("reference_45_closer_2",0.09,23)[0], Compare("reference_45_closer_2",0.09,23)[1], label = r'Reference 45$^\circ$  Run 2.2', color = 'firebrick')
+# plt.scatter(Compare("reference_lens",0.05,23)[0], Compare("reference_lens",0.05,23)[1], label = r'Reference with Lens  Run 1', color = 'firebrick')
 
 
-# plt.plot(Comparison_Function("reference_lens",0.05,20)[0], Noise_Reduction(Comparison_Function("reference_lens",0.05,20)[1],4), label = r'Reference with Lens  Run 1', color = 'rosybrown')
-# plt.scatter(Comparison_Function("reference_lens",0.05,23)[2], Noise_Reduction(Comparison_Function("reference_lens",0.05,23)[3],0), label = r'Reference with Lens  Run 2.1', color = 'darkgreen')
+# plt.plot(Compare("reference_lens",0.05,20)[0], Noise_Reduction(Compare("reference_lens",0.05,20)[1],4), label = r'Reference with Lens  Run 1', color = 'rosybrown')
+# plt.scatter(Compare("reference_lens",0.05,23)[2], Noise_Reduction(Compare("reference_lens",0.05,23)[3],0), label = r'Reference with Lens  Run 2.1', color = 'darkgreen')
 
 
-# plt.plot(Comparison_Function("reference_lens_2",0.0,20)[0], Noise_Reduction(Comparison_Function("reference_lens_2",0.0,20)[1],4), label = r'Reference with Lens  Run 2', color = 'tomato')
-# plt.scatter(Comparison_Function("reference_lens_2",0.0,23)[2], Noise_Reduction(Comparison_Function("reference_lens_2",0.0,23)[3],0), label = r'Reference with Lens  Run 2', color = 'tomato')
+# plt.plot(Compare("reference_lens_2",0.0,20)[0], Noise_Reduction(Compare("reference_lens_2",0.0,20)[1],4), label = r'Reference with Lens  Run 2', color = 'tomato')
+# plt.scatter(Compare("reference_lens_2",0.0,23)[2], Noise_Reduction(Compare("reference_lens_2",0.0,23)[3],0), label = r'Reference with Lens  Run 2', color = 'tomato')
 
-# plt.plot(Comparison_Function("reference_lens_2.1",0.0,20)[0], Noise_Reduction(Comparison_Function("reference_lens_2.1",0.0,20)[1],4), label = r'Reference with Lens  Run 2.1', color = 'darkgreen')
-# plt.scatter(Comparison_Function("reference_lens_2.1",0.0,20)[2], Noise_Reduction(Comparison_Function("reference_lens_2.1",0.0,20)[3],0), label = r'Reference with Lens  Run 2.1', color = 'darkgreen')
+# plt.plot(Compare("reference_lens_2.1",0.0,20)[0], Noise_Reduction(Compare("reference_lens_2.1",0.0,20)[1],4), label = r'Reference with Lens  Run 2.1', color = 'darkgreen')
+# plt.scatter(Compare("reference_lens_2.1",0.0,20)[2], Noise_Reduction(Compare("reference_lens_2.1",0.0,20)[3],0), label = r'Reference with Lens  Run 2.1', color = 'darkgreen')
 
-# plt.plot(reference_lens_x, Noise_Reduction(reference_lens_y,4), color = 'tomato', label = 'Average of Lens Run 2')
+plt.plot(reference_lens_x, Noise_Reduction(reference_lens_y,4), color = 'tomato', label = 'Average of Lens Run 2')
+# plt.scatter(reference_lens_x, Noise_Reduction(reference_lens_y,4), color = 'tomato', label = 'Average of Lens Run 2')
 
 # plt.plot(reference_45_closer_x, Noise_Reduction(reference_45_closer_y,4), label = 'Average of Reference Scan 2', color = 'fuchsia')
 #
 # WATER RUN
-# plt.plot(Comparison_Function("water",0.6,25)[2], Comparison_Function("water",0.6,25)[3], label = 'Water Run 1 Without Average', color = 'b')
-# plt.scatter(Comparison_Function("water",0.6,25)[2], Comparison_Function("water",0.6,25)[3], label = 'Water Run 1 Without Average', color = 'b')
-# plt.plot(Comparison_Function("water",0.6,25)[0], Noise_Reduction(Comparison_Function("water",0.6,25)[1],4), label = 'Water Run 1', color = 'b')
+# plt.plot(Compare("water",0.6,25)[2], Compare("water",0.6,25)[3], label = 'Water Run 1 Without Average', color = 'b')
+# plt.scatter(Compare("water",0.6,25)[2], Compare("water",0.6,25)[3], label = 'Water Run 1 Without Average', color = 'b')
+# plt.plot(Compare("water",0.6,25)[0], Noise_Reduction(Compare("water",0.6,25)[1],4), label = 'Water Run 1', color = 'b')
 
-# plt.plot(Comparison_Function("water_45",0.08,22)[2], Noise_Reduction(Comparison_Function("water_45",0.08,22)[3],4), label = r'Water 45$^\circ$  Run 1.1', color = 'orange')
-# plt.scatter(Comparison_Function("water_45",0.08,20)[2], Noise_Reduction(Comparison_Function("water_45",0.08,20)[3],4), label = r'Water 45$^\circ$  Run 1.1', color = 'orange')
+# plt.plot(Compare("water_45",0.08,22)[2], Noise_Reduction(Compare("water_45",0.08,22)[3],4), label = r'Water 45$^\circ$  Run 1.1', color = 'orange')
+# plt.scatter(Compare("water_45",0.08,20)[2], Noise_Reduction(Compare("water_45",0.08,20)[3],4), label = r'Water 45$^\circ$  Run 1.1', color = 'orange')
 
-## plt.plot(Comparison_Function("water_45_2",0.08,20)[0], Noise_Reduction(Comparison_Function("water_45_2",0.08,20)[1],4), label = r'Water 45$^\circ$  Run 1.2', color = 'r')
+## plt.plot(Compare("water_45_2",0.08,20)[0], Noise_Reduction(Compare("water_45_2",0.08,20)[1],4), label = r'Water 45$^\circ$  Run 1.2', color = 'r')
 ## USE THE ONE BELOW FOR COMPARING WITH WATER_45
 
 # USE THIS
 # plt.plot(water_45_x, Noise_Reduction(water_45_y,4), label = r'Average of Water 45$^\circ$ Run 1' , color = 'r')
 
-# plt.plot(water_45_closer_x, Noise_Reduction(water_45_closer_y,4), label = r'Average of Water 45$^\circ$ Run 2' , color = 'navy')
+plt.plot(water_45_closer_x, Noise_Reduction(water_45_closer_y,4), label = r'Average of Water 45$^\circ$ Run 2' , color = 'navy')
 
 ##
-## plt.plot(Comparison_Function("water_45_closer",0.09,23)[2], Comparison_Function("water_45_closer",0.09,23)[3], label = 'Water 45$^\circ$ Run 2.1', color = 'chartreuse')
-## plt.scatter(Comparison_Function("water_45_closer",0.09,23)[2], Comparison_Function("water_45_closer",0.09,23)[3], label = 'Water 45$^\circ$ Run 2.1', color = 'chartreuse')
-## plt.plot(Comparison_Function("water_45_closer_2",0.08,34)[2], Comparison_Function("water_45_closer_2",0.08,34)[3], label = 'Water 45$^\circ$ Run 2.2', color = 'maroon')
-## plt.scatter(Comparison_Function("water_45_closer_2",0.08,34)[2], Comparison_Function("water_45_closer_2",0.08,34)[3], label = 'Water 45$^\circ$ Run 2.2', color = 'r')
-## plt.plot(Comparison_Function("water_45_closer",0.09,34)[0], Noise_Reduction(Comparison_Function("water_45_closer",0.09,34)[1],4), label = 'Water 45$^\circ$ Run 2.1', color = 'chartreuse')
+## plt.plot(("water_45_closer",0.09,23)[2], Compare("water_45_closer",0.09,23)[3], label = 'Water 45$^\circ$ Run 2.1', color = 'chartreuse')
+## plt.scatter(Compare("water_45_closer",0.09,23)[2], Compare("water_45_closer",0.09,23)[3], label = 'Water 45$^\circ$ Run 2.1', color = 'chartreuse')
+## plt.plot(Compare("water_45_closer_2",0.08,34)[2], Compare("water_45_closer_2",0.08,34)[3], label = 'Water 45$^\circ$ Run 2.2', color = 'maroon')
+## plt.scatter(Compare("water_45_closer_2",0.08,34)[2], Compare("water_45_closer_2",0.08,34)[3], label = 'Water 45$^\circ$ Run 2.2', color = 'r')
+## plt.plot(Compare("water_45_closer",0.09,34)[0], Noise_Reduction(Compare("water_45_closer",0.09,34)[1],4), label = 'Water 45$^\circ$ Run 2.1', color = 'chartreuse')
 
-# plt.plot(Comparison_Function("water_45_closer_2",0.09,22)[0], Noise_Reduction(Comparison_Function("water_45_closer_2",0.09,22)[1],4), label = 'Water 45$^\circ$ Run 2.2', color = 'maroon')
+# plt.plot(Compare("water_45_closer_2",0.09,22)[0], Noise_Reduction(Compare("water_45_closer_2",0.09,22)[1],4), label = 'Water 45$^\circ$ Run 2.2', color = 'maroon')
 
 
-# plt.scatter(Comparison_Function("water_45_closer_2",0.08,22)[0], Noise_Reduction(Comparison_Function("water_45_closer_2",0.08,22)[1],4), label = 'Water 45$^\circ$ Run 2.2', color = 'maroon')
-# plt.plot(water_45_closer_x, Noise_Reduction(water_45_closer_y,4), label = 'Average of Water 45$^\circ$', color = 'darksalmon')
+# plt.scatter(Compare("water_45_closer_2",0.08,22)[0], Noise_Reduction(Compare("water_45_closer_2",0.08,22)[1],4), label = 'Water 45$^\circ$ Run 2.2', color = 'maroon')
+# plt.plot(water_45_closer_x, Noise_Reduction(water_45_closer_y,4), label = 'Averagege of Water 45$^\circ$', color = 'darksalmon')
 # plt.scatter(water_45_closer_x, Noise_Reduction(water_45_closer_y,4), label = 'Average of Water 45$^\circ$', color = 'darksalmon')
 
 # LEAF RUN
-# plt.plot(Comparison_Function("leaf",0.19,23)[0], Comparison_Function("leaf",0.19,23)[1], label = 'Leaf Run 1', color = 'g')
-# plt.plot(Comparison_Function("leaf_2",0.092,23)[0], Comparison_Function("leaf_2",0.092,23)[1], label = 'Leaf Run 2', color = 'm') # period = 28
+# plt.plot(Compare("leaf",0.19,23)[0], Compare("leaf",0.19,23)[1], label = 'Leaf Run 1', color = 'g')
+# plt.plot(Compare("leaf_2",0.092,23)[0], Compare("leaf_2",0.092,23)[1], label = 'Leaf Run 2', color = 'm') # period = 28
 # plt.plot(leaf_average_x, Noise_Reduction(leaf_average_y,4), label = 'Average of Leaf Run', color = 'sandybrown')
 
 # ACERTONE RUN
-# plt.plot(Comparison_Function("acetone_closer",0.1,20)[0],Noise_Reduction(Comparison_Function("acetone_closer",0.1,20)[1],4), label = 'Acetone Run 1', color = 'chocolate')
-# plt.plot(Comparison_Function("acetone_closer_2",0.1,24)[0],Noise_Reduction(Comparison_Function("acetone_closer",0.1,24)[1],4), label = 'Acetone Run 2', color = 'tan')
-# plt.scatter(Comparison_Function("acetone_closer_2",0.1,24)[0],Noise_Reduction(Comparison_Function("acetone_closer",0.1,24)[1],4), label = 'Acetone Run 1', color = 'powderblue')
-# plt.spines['bottom'].set_position('zero')
+# plt.plot(Compare("acetone_closer",0.1,20)[0],Noise_Reduction(Compare("acetone_closer",0.1,20)[1],4), label = 'Acetone Run 1', color = 'chocolate')
+# plt.plot(Compare("acetone_closer_2",0.1,20)[0],Noise_Reduction(Compare("acetone_closer",0.1,20)[1],4), label = 'Acetone Run 2', color = 'tan')
+# plt.scatter(Compare("acetone_closer_2",0.1,24)[2],Noise_Reduction(Compare("acetone_closer",0.1,24)[3],0), label = 'Acetone Run 1', color = 'powderblue')
+#
 plt.legend()
 plt.show()
