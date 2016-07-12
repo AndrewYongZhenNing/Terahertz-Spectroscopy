@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import fft
 #
-def Comparison_Function(filename,vertical_shift,period): #filename needs to be in strings
+def Compare(filename,vertical_shift,period): #filename needs to be in strings
     """Given a data file, this function plots a graph"""
 
     # def obtain_period(frequency_data,photocurrent_data):
@@ -50,7 +50,7 @@ def Comparison_Function(filename,vertical_shift,period): #filename needs to be i
 
     return (envelope_frequency_list,log_envelope_photocurrent_list,frequency_list,photocurrent_list)
 
-def Average_Function(function_1,function_2):
+def Average(function_1,function_2):
     """Takes two functions of the same dimension to make an average"""
     average_envelope_frequency = []
     average_envelope_photocurrent = []
@@ -102,16 +102,15 @@ def Noise_Reduction(data_set, nearest_neighbours):
     return improved_data
 #
 #
-reference_lens_x, reference_lens_y = Average_Function(Comparison_Function("reference_lens_2",0.0,20),Comparison_Function("reference_lens_2.1",0.00,20))[0],Average_Function(Comparison_Function("reference_lens_2",0.0,20),Comparison_Function("reference_lens_2.1",0.0,20))[1]
-water_45_closer_x, water_45_closer_y = Average_Function(Comparison_Function("water_45_closer_2",0.09,22),Comparison_Function("water_45_closer",0.09,22))[0], Average_Function(Comparison_Function("water_45_2",0.08,22),Comparison_Function("water_45",0.09,22))[1]
+reference_lens_x, reference_lens_y = Average(Compare("reference_lens_2",0.0,20),Compare("reference_lens_2.1",0.00,20))[0],Average(Compare("reference_lens_2",0.0,20),Compare("reference_lens_2.1",0.0,20))[1]
+water_45_closer_x, water_45_closer_y = Average(Compare("water_45_closer_2",0.09,22),Compare("water_45_closer",0.09,22))[0], Average(Compare("water_45_2",0.08,22),Compare("water_45",0.09,22))[1]
 #
 
 #
 y = Noise_Reduction(reference_lens_y,4)
-n = len(y)                       # length of the signal
-frequency = range(1,2417)           # one side frequency range
-FT_y = np.fft.fft(y)            # fft computing and normalization
-
+# n = len(y)                       # length of the signal
+frequency = range(1,len(y)+1)           # one side frequency range
+FT_y = np.fft.fft(y)            # fft computing here
 
 #DATA POINTS NEED CLEANING IN FT_y: 65 TO 85
 
@@ -146,8 +145,6 @@ plt.plot(frequency, abs(array), color = 'b', label = 'After Peak Removal')
 plt.legend()
 plt.show()
 
-
-# plt.figure()
 plt.subplot(2,1,1)
 plt.title('Comparison')
 plt.grid()
