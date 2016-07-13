@@ -6,7 +6,55 @@ from scipy.optimize import curve_fit
 # FUNCTION FOR DATA ANALYSIS
 #############################
 
-def Compare(filename): #filename needs to be in strings
+def Compare(filename,vertical_shift,period): #filename needs to be in strings
+    """Given a data file, this function plots a graph"""
+
+    # def obtain_period(frequency_data,photocurrent_data):
+    #     def function(x,a,b,c): #presumed shape of the graph
+    #         return a*np.sin(b*x)+c
+    #     popt, pcov = curve_fit(function,frequency_data[-1000:],photocurrent_data[-1000:])
+    #     period = (2*np.pi)/popt[1]
+    #     return period # NOTE PROBLEM IS HERE
+
+    plot = np.loadtxt(filename + ".dat")
+    frequency = plot[:,1]
+    photocurrent = plot[:,2] + vertical_shift
+    maximum_point = np.amax(plot[1:,0])
+    start = 0
+    period = period
+    end = period
+
+    photocurrent_list = []
+    frequency_list = []
+    envelope_photocurrent_list = []
+    envelope_frequency_list = []
+    log_envelope_photocurrent_list = []
+
+    for value in photocurrent: #converts array to list [for now]
+        photocurrent_list.append(value)
+
+    for value in frequency:
+        frequency_list.append(value)
+
+    while start < maximum_point-period and end < maximum_point:
+        # for plot #
+        shortened_photocurrent_list = photocurrent_list[start:end]
+        shortened_frequency_list = frequency_list[start:end] # shortened list helps to select the right photocurrent and frequency WITHIN the start and end boundaries
+        max_photocurrent = np.amax(photocurrent[start:end]) #picks out maximum value of photocurrent in one period
+        envelope_photocurrent_list.append(max_photocurrent) #puts maximum photocurrent in list
+        index = shortened_photocurrent_list.index(max_photocurrent) # gets the index corresponding to the selected photocurrent
+        envelope_frequency_list.append(shortened_frequency_list[index])
+
+        start += period
+        end += period
+
+    for value in envelope_photocurrent_list:
+        new_value = 20*np.log10(value)
+        log_envelope_photocurrent_list.append(new_value)
+
+    return (envelope_frequency_list,log_envelope_photocurrent_list,frequency_list,photocurrent_list)
+
+def Compare2(filename): #filename needs to be in strings
     """Given a data file, this function plots a graph"""
 
     plot = np.loadtxt(filename + ".dat")
@@ -20,7 +68,7 @@ def Compare(filename): #filename needs to be in strings
         SUM += value
 
     if SUM > 0:
-        photocurrent = photocurrent + SUM
+        photocurrent = photocurrent - SUM
     elif SUM < 0:
         photocurrent = photocurrent - SUM
 
@@ -75,7 +123,8 @@ def Compare(filename): #filename needs to be in strings
         new_value = 20*np.log10(value)
         log_envelope_photocurrent_list.append(new_value)
     return (envelope_frequency_list,log_envelope_photocurrent_list,frequency_list,photocurrent_list)
-#
+
+
 def Average(function_1,function_2):
     """Takes two functions of the same dimension to make an average"""
     average_envelope_frequency = []
@@ -132,7 +181,7 @@ def Noise_Reduction(data_set, nearest_neighbours):
 
 
 
-reference_x, reference_y = Average(Compare("reference_scan2",0.5,24),Compare("reference_scan2.1",0.5,24))[0],Average(Compare("reference_scan2",0.5,24),Compare("reference_scan2.1",0.5,24))[1]
+# reference_x, reference_y = Average(Compare("reference_scan2",0.5,24),Compare("reference_scan2.1",0.5,24))[0],Average(Compare("reference_scan2",0.5,24),Compare("reference_scan2.1",0.5,24))[1]
 leaf_average_x, leaf_average_y = Average(Compare("leaf",0.19,23),Compare("leaf_2",0.092,23))[0], Average(Compare("leaf",0.19,23),Compare("leaf_2",0.092,23))[1]
 water_45_x, water_45_y = Average(Compare("water_45_2",0.08,22),Compare("water_45",0.08,22))[0], Average(Compare("water_45_2",0.08,22),Compare("water_45",0.08,22))[1]
 water_45_closer_x, water_45_closer_y = Average(Compare("water_45_closer_2",0.09,22),Compare("water_45_closer",0.09,22))[0], Average(Compare("water_45_2",0.08,22),Compare("water_45",0.09,22))[1]
@@ -250,13 +299,10 @@ plt.ylabel("Photocurrent $nA$")
 # plt.plot(Compare("acetone_closer_2",0.1,20)[0],Noise_Reduction(Compare("acetone_closer",0.1,20)[1],4), label = 'Acetone Run 2', color = 'tan')
 # plt.scatter(Compare("acetone_closer_2",0.1,24)[2],Noise_Reduction(Compare("acetone_closer",0.1,24)[3],0), label = 'Acetone Run 1', color = 'powderblue')
 #
-# WAFER RUN
-# plt.plot(Compare("wafer_1", 0.1,21)[0],Noise_Reduction(Compare("wafer_1", 0.1,21)[1],4), color = 'aquamarine', label = 'Wafer Run 1')
-# plt.scatter(Compare("wafer_1", 0.1,21)[0],Noise_Reduction(Compare("wafer_1", 0.1,21)[1],4))
 
-plt.plot(Compare("water",0.6,25)[2], Compare("water",0.6,25)[3], label = 'Water Run 1 Without Average', color = 'b')
-plt.scatter(Compare("water",0.6,25)[2], Compare("water",0.6,25)[3], label = 'Water Run 1 Without Average', color = 'b')
-#
+# WAFER RUN
+plt.plot(Compare("wafer_1",0.1,23)[0],Compare('wafer_1',0.1,23)[1])
+# plt.scatter(Compare("wafer_1",0.1,23)[0],Compare('wafer_1',0.1,23)[1])
 
 plt.legend()
 plt.show()
