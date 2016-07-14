@@ -62,7 +62,6 @@ def CompareNew(filename, nearest_neighbours): #filename needs to be in strings
     photocurrent = plot[:,2]
     maximum_point = np.amax(plot[1:,0])
 
-    #
     for value in photocurrent:
         SUM = 0
         SUM += value
@@ -90,9 +89,12 @@ def CompareNew(filename, nearest_neighbours): #filename needs to be in strings
 
     while index < len(frequency_list)-1: # length of frequency_list is 48334
     # for index in range(0,frequency_list[-1]+1):
-        if photocurrent_list[index] > 0 and photocurrent_list[index+1] < 0:
-            # acquire_index = frequency_list.index(frequency_list[index])
-            index_list.append(index)
+        if photocurrent_list[0] > photocurrent_list[1]:
+            if photocurrent_list[index] > 0 and photocurrent_list[index+1] < 0:
+                index_list.append(index)
+        elif photocurrent_list[0] < photocurrent_list[1]:
+            if photocurrent_list[index] < 0 and photocurrent_list[index+1] > 0:
+                index_list.append(index)
         index +=1
 
 
@@ -131,12 +133,6 @@ def CompareNew(filename, nearest_neighbours): #filename needs to be in strings
             liszt.append(noisy_data[(start_index)+i])
             i +=1
 
-    # for i in range(-(nearest_neighbours),(nearest_neighbours)): #for loop is awkward, fix here
-    #     liszt.append(start_index+i)
-        # for points in noisy_data[(start_index)+i]:
-        #     liszt.append(points)
-        # print 'current list is:',liszt
-
         total = sum(liszt)
         average_point = (1.*total)/((nearest_neighbours*2)+1) # the 1. is there to convert fractions into accurate decimal points
         improved_data.append(average_point)
@@ -144,11 +140,9 @@ def CompareNew(filename, nearest_neighbours): #filename needs to be in strings
 
         start_index += 1
 
-
     for index in range(len(noisy_data)-nearest_neighbours,len(noisy_data)): #fill in final few points into improved data
         improved_data.append(noisy_data[index])
 
-    # return improved_data
     return (envelope_frequency_list,improved_data,frequency_list,photocurrent_list)
 
 
@@ -166,7 +160,7 @@ def Average(function_1,function_2):
     return (average_envelope_frequency, average_envelope_photocurrent)
 
 
-def Noise_Reduction(data_set, nearest_neighbours):
+# def Noise_Reduction(data_set, nearest_neighbours):
     """Improves the quality of the data by reducing the noise of a graph. Takes the average from the nearest neighbours of each data point."""
     noisy_data = data_set
     improved_data = []
@@ -228,11 +222,6 @@ plt.ylabel("Photocurrent $nA$")#, fontsize = 30
 plt.xticks()#fontsize = 20
 plt.yticks()#fontsize = 20
 
-# plt.plot(water_45_x1,Noise_Reduction(water_45_y1,4), label = r'New: Average of Water 45$^\circ$ Run 1')
-# plt.plot(CompareNew("water_45")[0], Noise_Reduction(CompareNew("water_45")[1],8), label = 'Run 1')
-# plt.plot(CompareNew("water_45_2")[2], Noise_Reduction(CompareNew("water_45_2")[3],8), label = 'Run 2')
-plt.plot(CompareNew("water",0)[0],CompareNew("water",0)[1], label = 'Test')
-plt.plot(CompareNew("water",4)[0],CompareNew("water",4)[1], label = 'Test Reduced')
 # REFERENCE RUN
 #
 # plt.plot(Compare("reference_scan2",0.5,24)[2],Compare("reference_scan2",0.5,24)[3],  color = 'r', label = 'Average Reference Run')
