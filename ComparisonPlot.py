@@ -54,7 +54,7 @@ def Compare(filename,vertical_shift,period): #filename needs to be in strings
 
     return (envelope_frequency_list,log_envelope_photocurrent_list,frequency_list,photocurrent_list)
 
-def CompareNew(filename): #filename needs to be in strings
+def CompareNew(filename, nearest_neighbours): #filename needs to be in strings
     """Given a data file, this function plots a graph"""
 
     plot = np.loadtxt(filename + ".dat")
@@ -75,13 +75,11 @@ def CompareNew(filename): #filename needs to be in strings
     photocurrent_list = []
     frequency_list = []
     index_list = []
-    period_list = [0] #start with zero as first entry, introduce it as the starting point of the measurement
     envelope_photocurrent_list = []
     envelope_frequency_list = []
     log_envelope_photocurrent_list = []
 
     index = 0
-    j = 0
     k = 0
 
     for value in photocurrent: #converts array to list [for now]
@@ -97,15 +95,6 @@ def CompareNew(filename): #filename needs to be in strings
             index_list.append(index)
         index +=1
 
-    # print 'length of index is', len(index_list)
-
-    # while j < len(index_list)-1:
-    #     acquire_period = index_list[j+1] - index_list[j]
-    #     period_list.append(acquire_period)
-    #     j += 1
-    # print 'length of period list', len(period_list)
-    # print 'example index', index_list[0:15]
-    # print 'example period', period_list[0:15]
 
     while k < len(index_list)-1:
         start = index_list[k]
@@ -122,7 +111,45 @@ def CompareNew(filename): #filename needs to be in strings
     for value in envelope_photocurrent_list:
         new_value = 20*np.log10(value)
         log_envelope_photocurrent_list.append(new_value)
-    return (envelope_frequency_list,log_envelope_photocurrent_list,frequency_list,photocurrent_list)
+
+    # NOISE REDUCTION BEGINS HERE:
+    """Improves the quality of the data by reducing the noise of a graph. Takes the average from the nearest neighbours of each data point."""
+    noisy_data = log_envelope_photocurrent_list
+    improved_data = []
+    start_index = nearest_neighbours
+
+
+    for index in range(0,nearest_neighbours): #fill in improved_data list with the first 'unused' points first (from 0th data point to (start_index-1)th data point)
+        improved_data.append(noisy_data[index])
+
+    liszt = []
+
+
+    while start_index < len(noisy_data) - nearest_neighbours:#while start_index < 11,  maximum is thus 11 in this case
+        i = -(nearest_neighbours) #left most neighbour
+        while i < nearest_neighbours+1: #maximum value of i is equal to right most value
+            liszt.append(noisy_data[(start_index)+i])
+            i +=1
+
+    # for i in range(-(nearest_neighbours),(nearest_neighbours)): #for loop is awkward, fix here
+    #     liszt.append(start_index+i)
+        # for points in noisy_data[(start_index)+i]:
+        #     liszt.append(points)
+        # print 'current list is:',liszt
+
+        total = sum(liszt)
+        average_point = (1.*total)/((nearest_neighbours*2)+1) # the 1. is there to convert fractions into accurate decimal points
+        improved_data.append(average_point)
+        liszt[:] = [] #empties the list to be re-used again
+
+        start_index += 1
+
+
+    for index in range(len(noisy_data)-nearest_neighbours,len(noisy_data)): #fill in final few points into improved data
+        improved_data.append(noisy_data[index])
+
+    # return improved_data
+    return (envelope_frequency_list,improved_data,frequency_list,photocurrent_list)
 
 
 def Average(function_1,function_2):
@@ -187,7 +214,7 @@ water_45_closer_x, water_45_closer_y = Average(Compare("water_45_closer_2",0.09,
 reference_45_closer_x, reference_45_closer_y = Average(Compare("reference_45_closer_2",0.09,22),Compare("reference_45_closer",0.09,22))[0], Average(Compare("reference_45_closer_2",0.09,22),Compare("reference_45_closer",0.09,22))[1]
 reference_lens_x, reference_lens_y = Average(Compare("reference_lens_2",0.0,20),Compare("reference_lens_2.1",0.00,20))[0], Average(Compare("reference_lens_2",0.0,20),Compare("reference_lens_2.1",0.0,20))[1]
 
-water_45_x1, water_45_y1 = Average(CompareNew("water_45_2"),CompareNew("water_45"))[0], Average(CompareNew("water_45_2"),CompareNew("water_45"))[1]
+# water_45_x1, water_45_y1 = Average(CompareNew("water_45_2"),CompareNew("water_45"))[0], Average(CompareNew("water_45_2"),CompareNew("water_45"))[1]
 
 ###############
 # PLOT SECTION
@@ -203,8 +230,9 @@ plt.yticks()#fontsize = 20
 
 # plt.plot(water_45_x1,Noise_Reduction(water_45_y1,4), label = r'New: Average of Water 45$^\circ$ Run 1')
 # plt.plot(CompareNew("water_45")[0], Noise_Reduction(CompareNew("water_45")[1],8), label = 'Run 1')
-plt.plot(CompareNew("water_45_2")[2], Noise_Reduction(CompareNew("water_45_2")[3],8), label = 'Run 2')
-
+# plt.plot(CompareNew("water_45_2")[2], Noise_Reduction(CompareNew("water_45_2")[3],8), label = 'Run 2')
+plt.plot(CompareNew("water",0)[0],CompareNew("water",0)[1], label = 'Test')
+plt.plot(CompareNew("water",4)[0],CompareNew("water",4)[1], label = 'Test Reduced')
 # REFERENCE RUN
 #
 # plt.plot(Compare("reference_scan2",0.5,24)[2],Compare("reference_scan2",0.5,24)[3],  color = 'r', label = 'Average Reference Run')
